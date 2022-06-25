@@ -4,17 +4,17 @@ import { gql } from '@apollo/client';
 export const GET_ME = gql`
   {
     me {
-      _id: ID
-      username: String
-      email: String
-      bookCount: Int
-      savedBooks: {
-        bookId: String
-        authors: [String]
-        description: String
-        title: String
-        image: String
-        link: String
+      _id
+      username
+      email
+      bookCount
+      savedBooks {
+        bookId
+        authors
+        description
+        title
+        image
+        link
       }
     }
   }

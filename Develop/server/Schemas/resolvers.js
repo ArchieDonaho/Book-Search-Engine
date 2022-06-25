@@ -6,9 +6,9 @@ const { signToken } = require('../utils/auth');
 const resolvers = {
   Query: {
     // check if the user is logged in or not
-    me: async (parent, { username }, context) => {
+    me: async (parent, args, context) => {
       if (context.user) {
-        const userData = await User.findOne({})
+        const userData = await User.findOne({ _id: context.user._id })
           .select('-__v -password')
           .populate('savedBooks');
         return userData;
@@ -36,11 +36,12 @@ const resolvers = {
       return { token, user };
     },
 
-    saveBook: async (parent, { user, body }, context) => {
+    saveBook: async (parent, args, context) => {
+      console.log(args);
       if (context.user) {
         const userData = await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $addToSet: { savedBooks: body } },
+          { $addToSet: { savedBooks: args } },
           { new: true, runValidators: true }
         );
         return userData;
@@ -49,10 +50,11 @@ const resolvers = {
     },
 
     removeBook: async (parent, { bookId }, context) => {
+      console.log(bookId);
       if (context.user) {
         const userData = await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $pull: { savedBooks: bookId } },
+          { $pull: { savedBooks: { bookId: bookId } } },
           { new: true }
         );
         return userData;
