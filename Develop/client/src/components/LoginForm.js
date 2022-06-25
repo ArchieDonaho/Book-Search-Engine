@@ -1,21 +1,29 @@
 // see SignupForm.js for comments
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import { LOGIN_USER } from '../utils/mutations';
 import { useMutation } from '@apollo/client';
 import Auth from '../utils/auth';
 
+import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
+
 const LoginForm = () => {
   const [userFormData, setUserFormData] = useState({ email: '', password: '' });
   const [validated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [loginUser, { error }] = useMutation(LOGIN_USER);
+  // create state to hold saved bookId values
+  const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
+
+  // set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
+  useEffect(() => {
+    return () => saveBookIds(savedBookIds);
+  });
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setUserFormData({ ...userFormData, [name]: value });
   };
-
-  const [loginUser, { error }] = useMutation(LOGIN_USER);
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
@@ -33,7 +41,20 @@ const LoginForm = () => {
       });
 
       const { token, user } = data?.login || {};
+      // console.log(user.savedBooks);
+      // const savedBooks = Object.values(user).map((val) => {
+      //   return val;
+      // });
+      // console.log(savedBooks);
 
+      const savedBooks = Object.values(user).map((val) => {
+        return Object.values(val).map((value) => {
+          return value.bookId;
+        });
+      });
+      console.log(savedBooks[0]);
+
+      setSavedBookIds(savedBooks[0]);
       Auth.login(token);
     } catch (err) {
       console.error(err);

@@ -1,5 +1,3 @@
-import { SAVE_BOOK } from '../utils/mutations';
-import { useMutation } from '@apollo/client';
 import React, { useState, useEffect } from 'react';
 import {
   Jumbotron,
@@ -10,12 +8,10 @@ import {
   Card,
   CardColumns,
 } from 'react-bootstrap';
-
+import { SAVE_BOOK } from '../utils/mutations';
+import { useMutation } from '@apollo/client';
 import Auth from '../utils/auth';
-import {
-  // saveBook,
-  searchGoogleBooks,
-} from '../utils/API';
+import { searchGoogleBooks } from '../utils/API';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 
 const SearchBooks = () => {
@@ -23,13 +19,9 @@ const SearchBooks = () => {
   const [searchedBooks, setSearchedBooks] = useState([]);
   // create state for holding our search field data
   const [searchInput, setSearchInput] = useState('');
-
   // create state to hold saved bookId values
   const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
-
-  // TODO Use the Apollo useMutation() Hook to execute the SAVE_BOOK mutation in the handleSaveBook() function instead of the saveBook() function imported from the API file.
-  // Make sure you keep the logic for saving the book's ID to state in the try...catch block!
-
+  // create mutation to save a book
   const [saveBook, { error }] = useMutation(SAVE_BOOK);
 
   // set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
@@ -88,7 +80,6 @@ const SearchBooks = () => {
         variables: bookToSave,
       });
       const userData = data?.saveBook || {};
-      console.log('userData: ', userData);
 
       // if book successfully saves to user's account, save book id to state
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
